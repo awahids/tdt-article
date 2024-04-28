@@ -8,6 +8,7 @@ import { errorHandler, successResponse } from '@shared/utils/response';
 import { LocalAuthGuard } from '@shared/guards/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Prisma } from '@prisma/client';
 
 @ApiTags('Users')
 @Controller('v1')
