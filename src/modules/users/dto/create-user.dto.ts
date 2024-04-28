@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, MinLength, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, MinLength, Matches, IsUUID } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John' })
@@ -24,4 +24,9 @@ export class CreateUserDto {
   @Matches(/^(?=.*[A-Z])/, { message: 'password must contain at least one uppercase letter' })
   @Matches(/^(?=.*[\d\W])/, { message: 'password must contain at least one number or symbol', })
   password: string;
+
+  @ApiProperty({ example: 'Role UUID' })
+  @IsUUID()
+  @IsNotEmpty()
+  roleId: string;
 }

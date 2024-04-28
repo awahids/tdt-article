@@ -1,8 +1,10 @@
 import { PrismaService } from '@core/database/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { CreateUserInterface, createUserInterface } from './interface/create-user.interface';
 import * as bcrypt from 'bcrypt';
+import { errorResponse } from '@shared/utils/response';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,6 +15,9 @@ export class UserService {
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
+      include: {
+        role: true
+      }
     });
   }
 
@@ -33,17 +38,28 @@ export class UserService {
     });
   }
 
-  async createUser(userDto: Prisma.UserCreateInput): Promise<CreateUserInterface> {
-    const { name, email, password } = userDto;
+  async createUser(userDto: CreateUserDto): Promise<CreateUserInterface> {
+    const { roleId, password } = userDto
+
+    const role = await this.prisma.role.findFirst({
+      where: {
+        uuid: roleId
+      }
+    })
+
+    if (!role) {
+      return errorResponse('Role not found', HttpStatus.BAD_REQUEST)
+    }
+
     const user = await this.prisma.user.create({
       data: {
-        name,
-        email,
+        ...userDto,
         password: await bcrypt.hash(password, 10),
+        roleId: role.id
       }
-    });
+    })
 
-    return createUserInterface(user);
+    return createUserInterface(user, role)
   }
 
   async updateUser(params: {

@@ -26,6 +26,6 @@ export const errorHandler = (error: any) => {
   } else if (error.code === 'P2003') {
     return errorResponse(error.message);
   } else {
-    return errorResponse(error);
+    return errorResponse(error.message, error.statusCode);
   }
 }
